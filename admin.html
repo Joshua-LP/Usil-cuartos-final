@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Pollada USIL</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        .admin-header {
+            background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            color: white;
+            margin-bottom: 2rem;
+        }
+        .admin-header h1 {
+            margin: 0;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .admin-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        .result-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+        .result-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .result-card__teams {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin: 1rem 0;
+        }
+        .result-team {
+            flex: 1;
+            text-align: center;
+        }
+        .result-team__flag {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .result-team__name {
+            font-weight: 600;
+            color: var(--navy);
+        }
+        .result-inputs {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        .result-input {
+            width: 80px;
+            height: 80px;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            border: 2px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+        }
+        .result-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201,169,97,0.1);
+        }
+        .result-dash {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--gray-400);
+        }
+        .save-result-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gold);
+            color: var(--navy);
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .save-result-btn:hover {
+            background: var(--gold-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-gold);
+        }
+        .save-result-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-badge--pending {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+        .status-badge--completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .recalculate-btn {
+            background: var(--blue);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 2rem;
+            width: 100%;
+        }
+        .recalculate-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+        .login-admin {
+            max-width: 400px;
+            margin: 4rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+        .login-admin h2 {
+            text-align: center;
+            color: var(--navy);
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-ball"></div>
+        <p>Cargando...</p>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Login Admin -->
+    <div id="adminLogin" class="login-admin">
+        <h2>🔐 Panel Administrativo</h2>
+        <div class="field">
+            <label for="adminEmail">Correo Administrador</label>
+            <input type="email" id="adminEmail" placeholder="admin@usil.edu.pe">
+        </div>
+        <button class="btn-gold btn-full" id="btnAdminLogin">Ingresar</button>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" style="display:none;">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1>
+                    ⚙️ Panel de Administración
+                    <span id="adminName" style="font-size: 1rem; opacity: 0.8; margin-left: auto;"></span>
+                </h1>
+                <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Ingresa los resultados reales de cada partido para calcular puntos automáticamente</p>
+            </div>
+
+            <div class="admin-grid" id="resultsGrid"></div>
+
+            <button class="recalculate-btn" id="btnRecalculate">
+                🔄 Recalcular Todos los Puntos
+            </button>
+
+            <button class="btn-ghost btn-full" id="btnLogoutAdmin" style="margin-top: 1rem;">
+                Cerrar Sesión
+            </button>
+        </div>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+</body>
+</html>

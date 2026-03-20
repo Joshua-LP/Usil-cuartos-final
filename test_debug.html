@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Test - Pollada USIL</title>
+</head>
+<body>
+    <h1>Debug Test</h1>
+    <div id="result"></div>
+    <script>
+        // Test para verificar que el archivo JSON se cargue correctamente
+        async function testEmailsLoad() {
+            try {
+                const response = await fetch('usil_emails.json');
+                const emails = await response.json();
+
+                document.getElementById('result').innerHTML = `
+                    <p><strong>✅ Archivo JSON cargado correctamente</strong></p>
+                    <p>Total de emails: ${emails.length}</p>
+                    <p>Primer email: ${emails[0]}</p>
+                    <p>Último email: ${emails[emails.length - 1]}</p>
+                    <p>¿Incluye jlopezp@usil.edu.pe? ${emails.includes('jlopezp@usil.edu.pe') ? '✅ Sí' : '❌ No'}</p>
+                    <p>¿Incluye joshua@usil.edu.pe? ${emails.includes('joshua@usil.edu.pe') ? '✅ Sí' : '❌ No'}</p>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <p><strong>❌ Error cargando JSON:</strong></p>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        }
+
+        testEmailsLoad();
+    </script>
+</body>
+</html>

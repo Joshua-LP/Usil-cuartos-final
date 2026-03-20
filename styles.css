@@ -255,6 +255,7 @@ input { font-family:inherit; }
 }
 .field-hint.hint--error { color:var(--red); }
 .field-hint.hint--ok    { color:var(--green); }
+.field-hint.hint--loading { color:var(--blue); }
 
 /* Rules mini */
 .rules-preview span { font-size:.7rem; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:1px; }

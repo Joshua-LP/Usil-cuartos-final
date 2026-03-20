@@ -42,6 +42,7 @@ const quarterFinals = [
 
 // ─── Estado ───
 let usilEmails = [];
+let emailsLoaded = false;
 let userData = { name:'', email:'', predictions:{} };
 
 // ─── Inicialización ───
@@ -71,12 +72,25 @@ async function loadEmailWhitelist() {
         console.log('[EMAILS] Cargando lista blanca...');
         const res = await fetch('usil_emails.json');
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        usilEmails = await res.json();
-        console.log(`[EMAILS] ${usilEmails.length} correos autorizados`);
+
+        const emails = await res.json();
+        if (!Array.isArray(emails)) throw new Error('Invalid JSON format');
+
+        usilEmails = emails.map(email => email.trim().toLowerCase());
+        emailsLoaded = true;
+        console.log(`[EMAILS] ${usilEmails.length} correos autorizados cargados exitosamente`);
+
+        // Re-validar email si ya hay uno ingresado
+        const emailInput = document.getElementById('userEmail');
+        if (emailInput && emailInput.value.trim()) {
+            setTimeout(() => handleEmailInput(), 100);
+        }
+
     } catch (error) {
         console.warn('[EMAILS] No se pudo cargar usil_emails.json:', error);
         console.warn('[EMAILS] Se validará solo dominio @usil.edu.pe');
         usilEmails = [];
+        emailsLoaded = true; // Marcar como cargado aunque falló
     }
 }
 
@@ -160,11 +174,23 @@ function validateUSILEmail(email) {
         return { valid:false, reason:'Solo se permiten correos @usil.edu.pe' };
     }
 
-    // 3. Lista blanca (si está cargada)
+    // 3. Verificar si los emails están cargados
+    if (!emailsLoaded) {
+        console.log('[VALIDATION] Emails not loaded yet, allowing temporarily');
+        return { valid:false, reason:'Cargando lista de correos autorizados...' };
+    }
+
+    // 4. Lista blanca (si está cargada)
     if (usilEmails.length > 0) {
         const found = usilEmails.includes(cleaned);
         console.log(`[VALIDATION] Checking in whitelist (${usilEmails.length} emails): ${found}`);
+        console.log(`[VALIDATION] Looking for: "${cleaned}"`);
         if (!found) {
+            // Debug: mostrar algunos emails cercanos
+            const similar = usilEmails.filter(e => e.includes(cleaned.split('@')[0]));
+            if (similar.length > 0) {
+                console.log('[VALIDATION] Similar emails found:', similar.slice(0, 3));
+            }
             return { valid:false, reason:'Este correo no está en el registro de personal USIL' };
         }
     } else {
@@ -197,6 +223,14 @@ function handleEmailInput() {
         return;
     }
 
+    // Mostrar estado de carga si los emails no están listos
+    if (!emailsLoaded) {
+        icon.textContent = '';
+        hint.textContent = 'Cargando lista de correos autorizados...';
+        hint.classList.add('hint--loading');
+        return;
+    }
+
     // Debounce validation
     emailValidationTimeout = setTimeout(() => {
         if (val.includes('@') && !val.endsWith('@usil.edu.pe')) {
@@ -218,6 +252,7 @@ function handleEmailInput() {
                 hint.classList.add('hint--error');
             }
         }
+        hint.classList.remove('hint--loading');
     }, 300); // Wait 300ms before validating
 }
 
@@ -492,13 +527,14 @@ function listenRankingRealTime() {
                 }
             });
 
-            // Puntos = se calcularán cuando haya resultados oficiales.
-            // Por ahora mostramos completados como métrica.
+            // Usar puntos reales calculados por el admin, o 0 si no hay
+            const totalPoints = data.totalPoints || 0;
+
             participants.push({
                 name: data.name || data.email,
                 email: data.email,
                 completed: completedCount,
-                points: completedCount * 5  // Placeholder hasta resultados reales
+                points: totalPoints
             });
         });
 
