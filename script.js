@@ -136,12 +136,32 @@ function bindEvents() {
 // ─── Validación USIL ───
 function validateUSILEmail(email) {
     const cleaned = email.trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned))
+    console.log(`[VALIDATION] Validating: "${cleaned}"`);
+
+    // 1. Formato válido
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleaned)) {
+        console.log('[VALIDATION] Invalid format');
         return { valid:false, reason:'Formato de correo inválido' };
-    if (!cleaned.endsWith('@usil.edu.pe'))
+    }
+
+    // 2. Dominio USIL
+    if (!cleaned.endsWith('@usil.edu.pe')) {
+        console.log('[VALIDATION] Not USIL domain');
         return { valid:false, reason:'Solo se permiten correos @usil.edu.pe' };
-    if (usilEmails.length > 0 && !usilEmails.includes(cleaned))
-        return { valid:false, reason:'Este correo no está en el registro de personal USIL' };
+    }
+
+    // 3. Lista blanca (si está cargada)
+    if (usilEmails.length > 0) {
+        const found = usilEmails.includes(cleaned);
+        console.log(`[VALIDATION] Checking in whitelist (${usilEmails.length} emails): ${found}`);
+        if (!found) {
+            return { valid:false, reason:'Este correo no está en el registro de personal USIL' };
+        }
+    } else {
+        console.log('[VALIDATION] No whitelist loaded, allowing all @usil.edu.pe');
+    }
+
+    console.log('[VALIDATION] Email approved');
     return { valid:true, reason:'' };
 }
 
