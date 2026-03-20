@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pollada FIFA 2026 - USIL</title>
+    <title>Polla FIFA 2026 - USIL</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,11 +24,11 @@
     <header class="header">
         <div class="header-inner">
             <div class="header-left">
-                <img src="usil-30.webp" alt="USIL 30 años" class="logo">
+                <img src="Sin título.jpg" alt="USIL" class="logo">
                 <div class="header-divider"></div>
                 <div class="header-title">
                     <span class="header-badge">FIFA 2026</span>
-                    <h1>Pollada USIL</h1>
+                    <h1>Polla USIL</h1>
                 </div>
             </div>
             <nav class="header-nav" id="headerNav" style="display:none;">
@@ -39,6 +39,10 @@
                 <button class="nav-btn" id="btnNavRanking" data-section="ranking">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                     Ranking
+                </button>
+                <button class="nav-btn nav-btn--admin" id="btnNavAdmin" data-section="admin" style="display:none;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                    Admin
                 </button>
                 <div class="user-avatar" id="userAvatar" title="Mi cuenta"></div>
             </nav>
@@ -122,10 +126,15 @@
         <section class="welcome-bar" id="welcomeBar">
             <div class="container welcome-inner">
                 <div>
-                    <h3 id="welcomeName">Hola, Usuario</h3>
+                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                        <h3 id="welcomeName">Hola, Usuario</h3>
+                        <button class="btn-edit-name" id="btnEditName" title="Corregir nombre">✏️</button>
+                    </div>
                     <p id="welcomeEmail">correo@usil.edu.pe</p>
                 </div>
-                <button class="btn-outline-sm" id="btnLogout">Cerrar sesión</button>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <button class="btn-outline-sm" id="btnLogout">Cerrar sesión</button>
+                </div>
             </div>
         </section>
 
@@ -133,8 +142,14 @@
             <!-- Sección Pronósticos -->
             <section id="sectionMatches">
                 <div class="section-head">
-                    <h2>Cuartos de Final</h2>
-                    <p>Selecciona el marcador que crees será el resultado final de cada partido</p>
+                    <h2>Pronósticos</h2>
+                    <p>Selecciona el marcador de cada partido. Solo aparecen los del día.</p>
+                    <div class="filter-bar">
+                        <button class="filter-btn active" id="filterToday" data-filter="today">Hoy</button>
+                        <button class="filter-btn" id="filterUpcoming" data-filter="upcoming">Próximos</button>
+                        <button class="filter-btn" id="filterAll" data-filter="all">Todos</button>
+                    </div>
+                    <div id="todayMatchesInfo" class="today-matches-info" style="margin-top: 0.75rem;"></div>
                 </div>
                 <div class="matches-grid" id="matchesGrid"></div>
                 <div class="actions-bar">
@@ -172,6 +187,30 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Sección Admin (solo administradores) -->
+            <section id="sectionAdmin" style="display:none;">
+                <div class="section-head">
+                    <h2>Panel de Administración</h2>
+                    <p>Crea partidos, ingresa resultados reales y revela los puntos cuando estés listo.</p>
+                </div>
+
+                <!-- Revelar Puntos (lo más importante arriba) -->
+                <div id="adminRevealSection"></div>
+
+                <!-- Agregar partido -->
+                <div class="admin-card" style="margin-top:1.5rem;">
+                    <h3 style="margin-bottom:1rem; color:var(--navy);">+ Agregar nuevo partido</h3>
+                    <div id="adminAddMatchForm"></div>
+                </div>
+
+                <!-- Lista de partidos y resultados -->
+                <h3 style="margin:1.5rem 0 1rem; color:var(--navy);">Partidos creados — Ingresar resultados reales</h3>
+                <div class="admin-results-grid" id="adminResultsGrid"></div>
+
+                <!-- Gestión de administradores -->
+                <div style="margin-top:1.5rem;" id="adminManagersSection"></div>
+            </section>
         </div>
     </main>
 
@@ -182,16 +221,34 @@
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11.5 14.5 16 9.5"/></svg>
             </div>
             <h3>Pronósticos enviados</h3>
-            <p>Tus predicciones han sido guardadas en la nube. Podrás modificarlas hasta 1 hora antes de cada partido.</p>
-            <button class="btn-gold btn-full" id="btnCloseConfirm">Entendido</button>
+            <p>Tus predicciones han sido guardadas en la nube. Podrás modificarlas hasta <strong>30 minutos antes</strong> del inicio de cada partido.</p>
+            <div style="margin-top: 1rem; padding: 0.75rem; background: #fef3c7; border-radius: 8px; font-size: 0.85rem; color: #92400e;">
+                <strong>Recuerda:</strong> Los pronósticos se bloquean automáticamente cuando un partido está por comenzar.
+            </div>
+            <button class="btn-gold btn-full" id="btnCloseConfirm" style="margin-top: 1.5rem;">Entendido</button>
+        </div>
+    </div>
+
+    <!-- Modal Editar Nombre -->
+    <div class="modal-overlay" id="modalEditName">
+        <div class="modal-box modal-box--sm">
+            <h3>Corregir nombre</h3>
+            <p style="margin-bottom:1rem; color:var(--gray-500);">Ingresa tu nombre correcto:</p>
+            <div class="field">
+                <input type="text" id="editNameInput" placeholder="Tu nombre completo" autocomplete="name">
+            </div>
+            <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+                <button class="btn-ghost" id="btnCancelEditName" style="flex:1;">Cancelar</button>
+                <button class="btn-gold" id="btnSaveEditName" style="flex:1;">Guardar</button>
+            </div>
         </div>
     </div>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container footer-inner">
-            <img src="usil-30.webp" alt="USIL" class="footer-logo">
-            <p>&copy; 2026 Universidad San Ignacio de Loyola &mdash; Pollada Mundial FIFA 2026</p>
+            <img src="Sin título.jpg" alt="USIL" class="footer-logo">
+            <p>&copy; 2026 Universidad San Ignacio de Loyola &mdash; Polla Mundial FIFA 2026</p>
             <div class="footer-links">
                 <a href="#" id="linkReglamento">Reglamento</a>
                 <a href="#" id="linkContacto">Contacto</a>

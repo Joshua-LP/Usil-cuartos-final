@@ -1,4 +1,4 @@
-# 🏆 Pollada FIFA 2026 - Sistema de Pronósticos
+# 🏆 Polla FIFA 2026 - Sistema de Pronósticos
 
 Sistema completo de pronósticos deportivos para el Mundial FIFA 2026 con Firebase y administración en tiempo real.
 
@@ -194,7 +194,7 @@ setInterval(autoFetchResults, 3600000);
 ## 📁 Estructura del Proyecto
 
 ```
-SISTEMA POLLADA/
+SISTEMA POLLA/
 │
 ├── index.html          # Página principal (usuarios)
 ├── admin.html          # Panel administrativo
@@ -287,4 +287,4 @@ Simplemente corrígelo en el panel admin y click "Recalcular Todos los Puntos".
 
 ---
 
-**Desarrollado para USIL - Pollada FIFA 2026** 🏆⚽
+**Desarrollado para USIL - Polla FIFA 2026** 🏆⚽

@@ -1,5 +1,5 @@
 /* ==================================================
-   ADMIN PANEL - POLLADA FIFA 2026
+   ADMIN PANEL - POLLA FIFA 2026
    ================================================== */
 
 // ─── Firebase SDK ───
@@ -27,22 +27,21 @@ const db = getFirestore(app);
 const resultsCol = collection(db, 'results');
 const predictCol = collection(db, 'predictions');
 
-// ─── Datos de partidos ───
+// ─── Datos de partidos (Cuartos de Final - 2 partidos por día) ───
 const quarterFinals = [
-    { id:1, tag:'QF1', date:'2026-07-09', time:'15:00', team1:{name:'Brasil',flag:'🇧🇷'},          team2:{name:'Argentina',flag:'🇦🇷'} },
-    { id:2, tag:'QF2', date:'2026-07-09', time:'19:00', team1:{name:'España',flag:'🇪🇸'},          team2:{name:'Francia',flag:'🇫🇷'} },
-    { id:3, tag:'QF3', date:'2026-07-10', time:'15:00', team1:{name:'Inglaterra',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},   team2:{name:'Alemania',flag:'🇩🇪'} },
-    { id:4, tag:'QF4', date:'2026-07-10', time:'19:00', team1:{name:'Portugal',flag:'🇵🇹'},        team2:{name:'Italia',flag:'🇮🇹'} },
-    { id:5, tag:'QF5', date:'2026-07-11', time:'15:00', team1:{name:'Países Bajos',flag:'🇳🇱'},    team2:{name:'Bélgica',flag:'🇧🇪'} },
-    { id:6, tag:'QF6', date:'2026-07-11', time:'19:00', team1:{name:'Uruguay',flag:'🇺🇾'},         team2:{name:'Colombia',flag:'🇨🇴'} },
-    { id:7, tag:'QF7', date:'2026-07-12', time:'15:00', team1:{name:'México',flag:'🇲🇽'},          team2:{name:'Estados Unidos',flag:'🇺🇸'} },
-    { id:8, tag:'QF8', date:'2026-07-12', time:'19:00', team1:{name:'Japón',flag:'🇯🇵'},           team2:{name:'Corea del Sur',flag:'🇰🇷'} },
+    { id:1, tag:'QF1', datetime:'2026-07-09T15:00:00-05:00', team1:{name:'Brasil',flag:'🇧🇷'},          team2:{name:'Argentina',flag:'🇦🇷'} },
+    { id:2, tag:'QF2', datetime:'2026-07-09T19:00:00-05:00', team1:{name:'España',flag:'🇪🇸'},          team2:{name:'Francia',flag:'🇫🇷'} },
+    { id:3, tag:'QF3', datetime:'2026-07-10T15:00:00-05:00', team1:{name:'Inglaterra',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿'},   team2:{name:'Alemania',flag:'🇩🇪'} },
+    { id:4, tag:'QF4', datetime:'2026-07-10T19:00:00-05:00', team1:{name:'Portugal',flag:'🇵🇹'},        team2:{name:'Italia',flag:'🇮🇹'} },
+    { id:5, tag:'QF5', datetime:'2026-07-11T15:00:00-05:00', team1:{name:'Países Bajos',flag:'🇳🇱'},    team2:{name:'Bélgica',flag:'🇧🇪'} },
+    { id:6, tag:'QF6', datetime:'2026-07-11T19:00:00-05:00', team1:{name:'Uruguay',flag:'🇺🇾'},         team2:{name:'Colombia',flag:'🇨🇴'} },
+    { id:7, tag:'QF7', datetime:'2026-07-12T15:00:00-05:00', team1:{name:'México',flag:'🇲🇽'},          team2:{name:'Estados Unidos',flag:'🇺🇸'} },
+    { id:8, tag:'QF8', datetime:'2026-07-12T19:00:00-05:00', team1:{name:'Japón',flag:'🇯🇵'},           team2:{name:'Corea del Sur',flag:'🇰🇷'} },
 ];
 
-// ─── Admins autorizados ───
+// ─── Admin autorizado (solo Joshua Gabriel Lopez Pinto) ───
 const ADMIN_EMAILS = [
-    'jlopezp@usil.edu.pe',
-    'joshua@usil.edu.pe'
+    'jlopezp@usil.edu.pe'
 ];
 
 // ─── Estado ───
@@ -75,7 +74,7 @@ function toast(msg, type = 'info') {
 
 // ─── Autenticación Admin ───
 function checkSession() {
-    const saved = localStorage.getItem('polladaAdmin_session');
+    const saved = localStorage.getItem('pollaAdmin_session');
     if (saved) {
         const s = JSON.parse(saved);
         if (s.email && ADMIN_EMAILS.includes(s.email.toLowerCase())) {
@@ -107,13 +106,13 @@ function handleAdminLogin() {
 
     adminData.email = email;
     adminData.isAdmin = true;
-    localStorage.setItem('polladaAdmin_session', JSON.stringify({ email }));
+    localStorage.setItem('pollaAdmin_session', JSON.stringify({ email }));
     showAdminPanel();
     toast(`¡Bienvenido, Admin!`, 'success');
 }
 
 function handleLogout() {
-    localStorage.removeItem('polladaAdmin_session');
+    localStorage.removeItem('pollaAdmin_session');
     adminData = { email: '', isAdmin: false };
     document.getElementById('adminPanel').style.display = 'none';
     document.getElementById('adminLogin').style.display = '';
@@ -151,8 +150,12 @@ function renderResultsGrid() {
     quarterFinals.forEach(match => {
         const result = matchResults[match.id] || { t1: '', t2: '', completed: false };
 
-        const fDate = new Date(match.date + 'T00:00:00').toLocaleDateString('es-PE', {
+        const matchTime = new Date(match.datetime);
+        const fDate = matchTime.toLocaleDateString('es-PE', {
             day:'numeric', month:'short', year:'numeric'
+        });
+        const fTime = matchTime.toLocaleTimeString('es-PE', {
+            hour:'2-digit', minute:'2-digit', hour12:false
         });
 
         const card = document.createElement('div');
@@ -160,10 +163,10 @@ function renderResultsGrid() {
         card.innerHTML = `
             <div class="result-card__header">
                 <div>
-                    <strong>${match.tag}</strong> · ${fDate} ${match.time}
+                    <strong>${match.tag}</strong> · ${fDate} ${fTime}
                 </div>
                 <span class="status-badge status-badge--${result.completed ? 'completed' : 'pending'}">
-                    ${result.completed ? 'Finalizado' : 'Pendiente'}
+                    ${result.completed ? '✓ Finalizado' : '⏱️ Pendiente'}
                 </span>
             </div>
             <div class="result-card__teams">
