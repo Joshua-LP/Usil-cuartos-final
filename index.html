@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pollada FIFA 2026 - USIL</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <div class="loader-ball"></div>
+        <p>Cargando...</p>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="header-left">
+                <img src="usil-30.webp" alt="USIL 30 años" class="logo">
+                <div class="header-divider"></div>
+                <div class="header-title">
+                    <span class="header-badge">FIFA 2026</span>
+                    <h1>Pollada USIL</h1>
+                </div>
+            </div>
+            <nav class="header-nav" id="headerNav" style="display:none;">
+                <button class="nav-btn active" id="btnNavPronos" data-section="matches">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    Pronósticos
+                </button>
+                <button class="nav-btn" id="btnNavRanking" data-section="ranking">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    Ranking
+                </button>
+                <div class="user-avatar" id="userAvatar" title="Mi cuenta"></div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===================== -->
+    <!-- VISTA 1: LOGIN / HERO -->
+    <!-- ===================== -->
+    <main id="viewLogin">
+        <section class="hero">
+            <div class="hero-bg">
+                <div class="hero-orb hero-orb--1"></div>
+                <div class="hero-orb hero-orb--2"></div>
+                <div class="hero-orb hero-orb--3"></div>
+            </div>
+            <div class="container hero-content">
+                <div class="hero-text">
+                    <span class="hero-chip">Cuartos de Final</span>
+                    <h2>Predice los resultados del <strong>Mundial 2026</strong></h2>
+                    <p>Compite con tus compañeros de USIL y demuestra quién sabe más de fútbol. Ingresa tu correo institucional y comienza.</p>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <span class="hero-stat__number" id="totalMatches">8</span>
+                            <span class="hero-stat__label">Partidos</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat__number" id="totalPlayers">...</span>
+                            <span class="hero-stat__label">Participantes</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat__number">5 pts</span>
+                            <span class="hero-stat__label">Exacto</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-form-wrapper">
+                    <div class="login-card">
+                        <div class="login-card__header">
+                            <h3>Ingresar</h3>
+                            <p>Solo personal USIL autorizado</p>
+                        </div>
+                        <div class="login-card__body">
+                            <div class="field">
+                                <label for="userName">Nombre completo</label>
+                                <input type="text" id="userName" placeholder="Ej: Juan Pérez" autocomplete="name">
+                            </div>
+                            <div class="field">
+                                <label for="userEmail">Correo institucional</label>
+                                <div class="input-with-icon">
+                                    <input type="email" id="userEmail" placeholder="tucorreo@usil.edu.pe" autocomplete="email">
+                                    <span class="input-icon" id="emailIcon"></span>
+                                </div>
+                                <span class="field-hint" id="emailHint">Debe ser un correo @usil.edu.pe registrado</span>
+                            </div>
+                            <button class="btn-gold btn-full" id="btnStartPronos">
+                                Comenzar a pronosticar
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                        <div class="login-card__footer">
+                            <div class="rules-preview">
+                                <span>Puntuación</span>
+                                <div class="rules-grid">
+                                    <div class="rule-item"><strong>5</strong> pts &mdash; Marcador exacto</div>
+                                    <div class="rule-item"><strong>3</strong> pts &mdash; Ganador correcto</div>
+                                    <div class="rule-item"><strong>2</strong> pts &mdash; Empate acertado</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ========================= -->
+    <!-- VISTA 2: PANEL PRONÓSTICOS -->
+    <!-- ========================= -->
+    <main id="viewApp" style="display:none;">
+        <section class="welcome-bar" id="welcomeBar">
+            <div class="container welcome-inner">
+                <div>
+                    <h3 id="welcomeName">Hola, Usuario</h3>
+                    <p id="welcomeEmail">correo@usil.edu.pe</p>
+                </div>
+                <button class="btn-outline-sm" id="btnLogout">Cerrar sesión</button>
+            </div>
+        </section>
+
+        <div class="container">
+            <!-- Sección Pronósticos -->
+            <section id="sectionMatches">
+                <div class="section-head">
+                    <h2>Cuartos de Final</h2>
+                    <p>Selecciona el marcador que crees será el resultado final de cada partido</p>
+                </div>
+                <div class="matches-grid" id="matchesGrid"></div>
+                <div class="actions-bar">
+                    <button class="btn-ghost" id="btnSaveDraft">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Guardar borrador
+                    </button>
+                    <button class="btn-gold" id="btnSubmitPronos">
+                        Enviar pronósticos
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Sección Ranking -->
+            <section id="sectionRanking" style="display:none;">
+                <div class="section-head">
+                    <h2>Tabla de Posiciones</h2>
+                    <p>Clasificación general de participantes &mdash; se actualiza en tiempo real</p>
+                </div>
+                <div class="ranking-card">
+                    <div class="ranking-podium" id="rankingPodium"></div>
+                    <div class="ranking-table-wrap">
+                        <table class="ranking-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Participante</th>
+                                    <th>Pronósticos</th>
+                                    <th>Puntos</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rankingBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal Confirmación -->
+    <div class="modal-overlay" id="modalConfirmation">
+        <div class="modal-box modal-box--sm">
+            <div class="modal-check">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11.5 14.5 16 9.5"/></svg>
+            </div>
+            <h3>Pronósticos enviados</h3>
+            <p>Tus predicciones han sido guardadas en la nube. Podrás modificarlas hasta 1 hora antes de cada partido.</p>
+            <button class="btn-gold btn-full" id="btnCloseConfirm">Entendido</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <img src="usil-30.webp" alt="USIL" class="footer-logo">
+            <p>&copy; 2026 Universidad San Ignacio de Loyola &mdash; Pollada Mundial FIFA 2026</p>
+            <div class="footer-links">
+                <a href="#" id="linkReglamento">Reglamento</a>
+                <a href="#" id="linkContacto">Contacto</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script type="module" src="script.js"></script>
+</body>
+</html>
