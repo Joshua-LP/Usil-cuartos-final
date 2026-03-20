@@ -88,21 +88,31 @@ function hideLoader() {
 }
 
 // ─── Toast ───
+let activeToasts = new Set();
+
 function toast(msg, type = 'info') {
+    // Prevenir toasts duplicados
+    if (activeToasts.has(msg)) return;
+
+    activeToasts.add(msg);
     const c = document.getElementById('toastContainer');
     const el = document.createElement('div');
     el.className = `toast toast--${type}`;
     el.textContent = msg;
     c.appendChild(el);
-    setTimeout(() => el.classList.add('removing'), 3000);
+
+    setTimeout(() => {
+        el.classList.add('removing');
+        activeToasts.delete(msg);
+    }, 3000);
     setTimeout(() => el.remove(), 3400);
 }
 
 // ─── Eventos ───
 function bindEvents() {
     const emailInput = document.getElementById('userEmail');
+    // Solo usar 'input' event, no 'blur' para evitar duplicados
     emailInput.addEventListener('input', handleEmailInput);
-    emailInput.addEventListener('blur', handleEmailInput);
     document.getElementById('userName').addEventListener('keypress', e => {
         if (e.key === 'Enter') emailInput.focus();
     });
@@ -165,11 +175,18 @@ function validateUSILEmail(email) {
     return { valid:true, reason:'' };
 }
 
+let emailValidationTimeout;
+
 function handleEmailInput() {
     const input = document.getElementById('userEmail');
     const icon  = document.getElementById('emailIcon');
     const hint  = document.getElementById('emailHint');
     const val   = input.value.trim().toLowerCase();
+
+    // Clear previous timeout to debounce
+    if (emailValidationTimeout) {
+        clearTimeout(emailValidationTimeout);
+    }
 
     input.classList.remove('input--valid','input--invalid');
     hint.classList.remove('hint--error','hint--ok');
@@ -180,25 +197,28 @@ function handleEmailInput() {
         return;
     }
 
-    if (val.includes('@') && !val.endsWith('@usil.edu.pe')) {
-        input.classList.add('input--invalid');
-        icon.textContent = '';
-        hint.textContent = 'Solo correos @usil.edu.pe';
-        hint.classList.add('hint--error');
-    } else if (val.endsWith('@usil.edu.pe')) {
-        const r = validateUSILEmail(val);
-        if (r.valid) {
-            input.classList.add('input--valid');
-            icon.textContent = '';
-            hint.textContent = 'Correo verificado';
-            hint.classList.add('hint--ok');
-        } else {
+    // Debounce validation
+    emailValidationTimeout = setTimeout(() => {
+        if (val.includes('@') && !val.endsWith('@usil.edu.pe')) {
             input.classList.add('input--invalid');
             icon.textContent = '';
-            hint.textContent = r.reason;
+            hint.textContent = 'Solo correos @usil.edu.pe';
             hint.classList.add('hint--error');
+        } else if (val.endsWith('@usil.edu.pe')) {
+            const r = validateUSILEmail(val);
+            if (r.valid) {
+                input.classList.add('input--valid');
+                icon.textContent = '';
+                hint.textContent = 'Correo verificado ✓';
+                hint.classList.add('hint--ok');
+            } else {
+                input.classList.add('input--invalid');
+                icon.textContent = '';
+                hint.textContent = r.reason;
+                hint.classList.add('hint--error');
+            }
         }
-    }
+    }, 300); // Wait 300ms before validating
 }
 
 // ─── Login ───
@@ -206,21 +226,35 @@ async function handleLogin() {
     const name  = document.getElementById('userName').value.trim();
     const email = document.getElementById('userEmail').value.trim().toLowerCase();
 
-    if (!name) { toast('Ingresa tu nombre completo','error'); return; }
+    if (!name) {
+        toast('Ingresa tu nombre completo','error');
+        document.getElementById('userName').focus();
+        return;
+    }
+
+    console.log('[LOGIN] Attempting login with:', email);
 
     const r = validateUSILEmail(email);
-    if (!r.valid) { toast(r.reason,'error'); return; }
+    if (!r.valid) {
+        toast(r.reason,'error');
+        document.getElementById('userEmail').focus();
+        return;
+    }
+
+    console.log('[LOGIN] Email validation passed');
 
     // Guardar usuario en Firestore
     try {
+        console.log('[LOGIN] Saving to Firestore...');
         const userDocRef = doc(usersCol, email);
         await setDoc(userDocRef, {
             name: name,
             email: email,
             lastLogin: serverTimestamp()
         }, { merge: true });
+        console.log('[LOGIN] User saved successfully');
     } catch (err) {
-        console.error('Error guardando usuario:', err);
+        console.error('[LOGIN] Firestore error:', err);
         toast('Error de conexión. Intenta de nuevo.', 'error');
         return;
     }
@@ -229,7 +263,7 @@ async function handleLogin() {
     userData.email = email;
     saveSession();
     showAppView();
-    toast(`Bienvenido/a, ${name.split(' ')[0]}!`, 'success');
+    toast(`¡Bienvenido/a, ${name.split(' ')[0]}!`, 'success');
 }
 
 function handleLogout() {
