@@ -1,4 +1,4 @@
-# 🏆 Pollada Mundial FIFA 2026 - USIL
+# 🏆 Polla Mundial FIFA 2026 - USIL
 
 <div align="center">
 
