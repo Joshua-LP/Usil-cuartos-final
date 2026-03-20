@@ -4,11 +4,11 @@
    ================================================== */
 
 // ─── Firebase SDK (módulos) ───
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import {
     getFirestore, collection, doc, setDoc, getDoc, getDocs,
     onSnapshot, query, orderBy, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // ─── Configuración Firebase ───
 const firebaseConfig = {
@@ -46,21 +46,36 @@ let userData = { name:'', email:'', predictions:{} };
 
 // ─── Inicialización ───
 document.addEventListener('DOMContentLoaded', async () => {
-    await loadEmailWhitelist();
-    loadSession();
-    bindEvents();
-    listenParticipantCount();
-    hideLoader();
+    try {
+        console.log('[INIT] Iniciando aplicación...');
+        await loadEmailWhitelist();
+        console.log('[INIT] Emails cargados');
+        loadSession();
+        console.log('[INIT] Sesión cargada');
+        bindEvents();
+        console.log('[INIT] Eventos vinculados');
+        listenParticipantCount();
+        console.log('[INIT] Listener de participantes activo');
+        hideLoader();
+        console.log('[INIT] App iniciada correctamente');
+    } catch (error) {
+        console.error('[ERROR FATAL]', error);
+        hideLoader();
+        toast('Error al iniciar la aplicación. Recarga la página.', 'error');
+    }
 });
 
 // ─── Lista blanca de correos ───
 async function loadEmailWhitelist() {
     try {
+        console.log('[EMAILS] Cargando lista blanca...');
         const res = await fetch('usil_emails.json');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         usilEmails = await res.json();
-        console.log(`[USIL] ${usilEmails.length} correos autorizados`);
-    } catch {
-        console.warn('usil_emails.json no disponible, se validará solo dominio');
+        console.log(`[EMAILS] ${usilEmails.length} correos autorizados`);
+    } catch (error) {
+        console.warn('[EMAILS] No se pudo cargar usil_emails.json:', error);
+        console.warn('[EMAILS] Se validará solo dominio @usil.edu.pe');
         usilEmails = [];
     }
 }
